@@ -197,3 +197,25 @@ boot_result =
   unnest(log_var)
 ```
 
+### Distribution of r.squared
+
+```{r}
+boot_result %>% 
+  ggplot(aes(x = r.squared)) + geom_density() + labs(
+    title = "Distribution of r.squared"
+  )
+```
+
+We could notice that the r.squared is nearly normal, and it has only a little heavy tail.
+
+### Distribution of log(b0 * b1)
+
+```{r}
+boot_result %>% 
+  ggplot(aes(x = log_var)) + geom_density() + labs(
+    title = "Distribution of log(beta_0 * beta_1)",
+    x = "log(beta_0 * beta_1)"
+  )
+```
+
+Here we could see that the log variable is more likely to be normal distributed.
