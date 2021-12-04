@@ -5,6 +5,7 @@ output: github_document
 
 ```{r setup}
 library(tidyverse)
+library(readr)
 
 knitr::opts_chunk$set(
   echo = TRUE,
@@ -24,3 +25,27 @@ scale_fill_discrete = scale_fill_viridis_d
 
 theme_set(theme_minimal() + theme(legend.position = "bottom"))
 ```
+
+# Problem 1
+
+Firstly load and clean the data
+
+```{r}
+birthweight = read_csv("./data/birthweight.csv")
+
+birthweight = 
+  birthweight %>% 
+  mutate(
+    babysex = factor(babysex),
+    frace = factor(frace),
+    malform = factor(malform),
+    mrace = factor(mrace),
+    babysex = fct_recode(babysex, "male" = "1", "female" = "2"),
+    frace = fct_recode(frace, "White" = "1", "Black" = "2", "Asian" = "3", 
+                       "Puerto Rican" = "4", "Other" = "8", "Unkonwn" = "9"),
+    malform = fct_recode(malform, "absent" = "0", "present" = "1"),
+    mrace = fct_recode(mrace, "White" = "1", "Black" = "2", "Asian" = "3",
+                       "Puerto Rican" = "4", "Other" = "8")
+  )
+```
+
