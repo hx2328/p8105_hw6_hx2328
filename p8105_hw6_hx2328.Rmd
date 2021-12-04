@@ -129,5 +129,71 @@ So, my model tends to have the best prediction compared with the other 2 models.
 
 # Problem 2
 
+Get the data
 
+```{r}
+weather_df = 
+  rnoaa::meteo_pull_monitors(
+    c("USW00094728"),
+    var = c("PRCP", "TMIN", "TMAX"), 
+    date_min = "2017-01-01",
+    date_max = "2017-12-31") %>%
+  mutate(
+    name = recode(id, USW00094728 = "CentralPark_NY"),
+    tmin = tmin / 10,
+    tmax = tmax / 10) %>%
+  select(name, id, everything())
+```
+
+Visualize the tmax and tmin
+
+```{r}
+weather_df %>% 
+  ggplot(aes(x = tmin, y = tmax)) + geom_point()
+```
+
+Try to do the linear regression on the whole data firstly and have a check of r square and log(beta0 * beta1).
+
+```{r}
+fit = lm(tmax ~ tmin, data = weather_df)
+
+# The model r.square
+fit %>% 
+  broom::glance() %>% 
+  .[[1]]
+
+# The model log(beta0 * beta1)
+coeff = fit %>% 
+  broom::tidy()
+log(coeff[[2]][1] * coeff[[2]][2])
+```
+
+Now Start Bootstrapping:
+
+```{r}
+# bootstrapping
+bootstrap = 
+  weather_df %>% 
+  bootstrap(n = 5000) %>% 
+   mutate(
+    models = map(strap, ~lm(tmax ~ tmin, data = .x)),
+    glance = map(models, broom::glance),
+    results = map(models, broom::tidy))
+
+# write a function to calculate the log(b0 * b1) of the model
+# the variable it takes is the result of broom::tidy()
+logg = function(tidy){
+  log(tidy[[2]][1] * tidy[[2]][2])
+}
+
+# extract
+boot_result = 
+  bootstrap %>% 
+  select(-strap, -models) %>% 
+  unnest(glance) %>% 
+  select(.id, r.squared, results) %>% 
+  mutate(log_var = map(.x = results, ~logg(.x))) %>% 
+  select(-results) %>% 
+  unnest(log_var)
+```
 
