@@ -53,19 +53,36 @@ Make a regression model
 
 Since there are lots of variables, would try to use backward elimination
 
-```{r}
+```{r results='hide'}
 # fit the regression, full model
 mult.fit = lm(bwt ~ ., data = birthweight)
 mult.fit %>% 
   broom::tidy()
+# backward elimination
+back_fit = step(mult.fit, direction = 'backward')
 ```
 
 ```{r}
-# backward elimination
-back_fit = step(mult.fit, direction = 'backward')
-
 back_fit %>% 
   broom::tidy()
 ```
 
 So these are the prediction variables that my model contains.
+
+Now get the plot of model residuals against fitted values
+
+```{r}
+birthweight_myfit = 
+  birthweight %>% 
+  modelr::add_predictions(back_fit, var = "fitted") %>% 
+  modelr::add_residuals(back_fit, var = "residual")
+
+birthweight_myfit %>% 
+  ggplot(aes(x = fitted, y = residual)) + geom_point(alpha = .3) + 
+  labs(
+    title = "Model Residuals Against Fitted Values",
+    x = "Fitted Values",
+    y = "Residuals"
+  )
+```
+
