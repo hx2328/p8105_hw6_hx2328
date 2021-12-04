@@ -49,3 +49,23 @@ birthweight =
   )
 ```
 
+Make a regression model
+
+Since there are lots of variables, would try to use backward elimination
+
+```{r}
+# fit the regression, full model
+mult.fit = lm(bwt ~ ., data = birthweight)
+mult.fit %>% 
+  broom::tidy()
+```
+
+```{r}
+# backward elimination
+back_fit = step(mult.fit, direction = 'backward')
+
+back_fit %>% 
+  broom::tidy()
+```
+
+So these are the prediction variables that my model contains.
