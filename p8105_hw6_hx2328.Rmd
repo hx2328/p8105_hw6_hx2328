@@ -219,3 +219,18 @@ boot_result %>%
 ```
 
 Here we could see that the log variable is more likely to be normal distributed.
+
+### Confidence Intervals
+
+```{r}
+boot_result %>% 
+  pivot_longer(r.squared:log_var, 
+               names_to = "variable", 
+               values_to = "estimate") %>% 
+  group_by(variable) %>% 
+   summarize(
+    ci_lower = quantile(estimate, 0.025), 
+    ci_upper = quantile(estimate, 0.975)) %>% 
+  knitr::kable()
+```
+
